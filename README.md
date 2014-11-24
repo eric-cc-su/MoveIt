@@ -3,6 +3,7 @@ MoveIt
 
 Personal project with Python to create a small app to sort and move photo files from an SD card to permanent directories
 
+First commit is labelled at version 2.1
 - **ClassyMoveIt.py** - The primary file to run app
 - **ClassMoveFunctions.py** - Includes functions to handle copying/moving files and defining source/destination directories.
 - **SDpathfile.db** - Settings file for the app to save users' usage settings, such as default paths and sorting preferences
