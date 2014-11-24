@@ -1,7 +1,13 @@
 MoveIt
 ======
 
-Personal project with Python to create a small app to sort and move photo files from an SD card to permanent directories
+Personal project with Python 2.7, using the Tkinter package, to create a utility to sort and move files from one storage source to another. Originally created to move photo files from an SD card to a primary and back-up hard drive, sorting the files into sub-directories by file dates. 
+
+**Functions**
+- Copy or Move files from one storage source to one or two other destination directories
+- User can specify MoveIt to place files in sub-directories at one or both destinations
+  - supports sub-directories of files' creation dates
+  - supports a user named sub-directory
 
 First commit is labelled at version 2.1
 - **ClassyMoveIt.py** - The primary file to run app
