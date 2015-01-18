@@ -29,16 +29,16 @@ def CopyAndMove(mode,startpath,endpath):
         fileList = os.listdir(startpath)
         if not os.path.exists(endpath):     #endpath does not exist (create directory)
             os.mkdir(endpath)
-            print "CREATED DIRECTORY: "+endpath+'\n'
+            print( "CREATED DIRECTORY: "+endpath+'\n' )
         for i in range(len(fileList)):      #iterate through directory and copy files
             try:
                 if mode=='copied':
                     shutil.copy2(startpath+'/'+fileList[i],endpath)
                 elif mode=='moved':
                     shutil.move(startpath+'/'+fileList[i],endpath)
-                print mode.capitalize()+' '+startpath+'/'+fileList[i]
+                print( mode.capitalize()+' '+startpath+'/'+fileList[i] )
             except:
-                print 'Error! '+startpath+'/'+fileList[i]+' not '+mode+'!'
+                print( 'Error! '+startpath+'/'+fileList[i]+' not '+mode+'!' )
                 response = 'One or more files not '+mode
     else:
         try:
@@ -46,9 +46,9 @@ def CopyAndMove(mode,startpath,endpath):
                 shutil.copy2(startpath,endpath)
             elif mode=='moved':
                 shutil.move(startpath,endpath)
-            print mode.capitalize()+' '+startpath+' to '+endpath
+            print( mode.capitalize()+' '+startpath+' to '+endpath )
         except:
-            print 'Error! '+startpath+'/'+' not '+mode+'!'
+            print( 'Error! '+startpath+'/'+' not '+mode+'!' )
             response = 'One or more files not '+mode 
     return response
     
@@ -59,7 +59,7 @@ Function to present user with a way to select a directory path
 """
 def FindPath(current): 
     os.system('cls')
-    print "Current "+current
+    print( "Current "+current )
     print
     skip = 0
     ShowVolumes()
@@ -77,11 +77,11 @@ def FindPath(current):
     print 
     while startpath not in [':/','']  and skip == 0:
         os.system('cls')
-        print "Current "+current
-        print "Path being set: "+startpath
+        print( "Current "+current )
+        print( "Path being set: "+startpath )
         print
         for i in range(len(os.listdir(startpath))):
-                print os.listdir(startpath)[i]
+                print( os.listdir(startpath)[i] )
         if len(os.listdir(startpath))==0:
             break
         else:
@@ -99,7 +99,7 @@ def FindPath(current):
 
             if path not in os.listdir(startpath) and path!='':
                 print
-                print "That is not an existing directory path!"
+                print( "That is not an existing directory path!" )
                 UserChoice = raw_input("Do you want to create this directory?(y/n)")
                 if UserChoice.lower() == 'y':
                     os.mkdir(startpath+path)
@@ -122,11 +122,11 @@ def FindPath(current):
         startpath = ''
     os.system('cls')
     if skip == 0:
-        print 'Path: '+startpath
+        prin( 'Path: '+startpath )
         print
         return startpath
     else:
-        print 'Path definition process terminated'
+        print( 'Path definition process terminated' )
         return None
 
 """
@@ -160,7 +160,7 @@ def GetManualPath(pathType): #pathType needs to be a string
         if os.path.exists(path):
             break
         else:
-            print "That is not an existing directory path!"
+            print( "That is not an existing directory path!" )
             UserChoice = raw_input("Do you want to create this directory?(y/n)")
             if UserChoice.lower() == 'y':
                 os.mkdir(path)
@@ -218,7 +218,7 @@ def go ( mode, sort, source, primary, backup ):
     response = "success"
 
     if backup == None and mode in [ 'copy2', 'move2' ]:
-        print "Back-Up destination path has not been defined!"
+        print( "Back-Up destination path has not been defined!" )
         skip = 1
 
     if skip == 0:
@@ -285,12 +285,12 @@ def go ( mode, sort, source, primary, backup ):
                         #Create sub-directories if needed
                         if not os.path.exists( base + suffix ) and not os.path.isdir( base + suffix ):
                             os.mkdir( base + suffix )
-                            print "Directory: " + ( base + suffix ) + " created\n"
+                            print( "Directory: " + ( base + suffix ) + " created\n" )
                     
                     #Does not transfer file if file already exists in destination
                     if os.path.exists( base + suffix + "/" + item ):
                         os.system( 'cls' )
-                        print base + suffix + " already exists! File not transferred"
+                        print( base + suffix + " already exists! File not transferred" )
                         response = "One or more files not transferred"
                         error += 1
                     
@@ -298,8 +298,8 @@ def go ( mode, sort, source, primary, backup ):
                     elif os.path.isdir( Gosource ):
                         try:
                             shutil.copytree( Gosource, base + suffix + "/" + item )
-                            print keyword.capitalize() + ": " + Gosource
-                            print "To: " + ( base + suffix )
+                            print( keyword.capitalize() + ": " + Gosource )
+                            print( "To: " + ( base + suffix ) )
                             success += 1
                         except:
                             response = "One or more files not transferred"
@@ -312,12 +312,12 @@ def go ( mode, sort, source, primary, backup ):
                             elif mode == "move1" or ( mode == "move2" and t == 1 ):
                                     shutil.move( Gosource, base + suffix )
                             os.system( "cls" )
-                            print keyword.capitalize() + ": " + Gosource
-                            print "To: " + ( base + suffix )
+                            print( keyword.capitalize() + ": " + Gosource )
+                            print( "To: " + ( base + suffix ) )
                             success += 1
                         
                         except:
-                            print "Error! " + Gosource + "/ not " + keyword + " to " + ( base + suffix ) + "!"
+                            print( "Error! " + Gosource + "/ not " + keyword + " to " + ( base + suffix ) + "!" )
                             response = "One or more files not transferred"
                             error += 1
                     
@@ -325,13 +325,13 @@ def go ( mode, sort, source, primary, backup ):
                     percent = (float(itemsdone)/float(total))*100
                     print 
                     if success != 0:
-                        print str( success ) + "/" + str( total ) + " file(s) transferred"
+                        print( str( success ) + "/" + str( total ) + " file(s) transferred" )
                     if error != 0:
-                        print str( error ) + " file(s) not transferred"
-                    print "Overall progress: " + str( int( percent ) ) + "%\n"
-            print response
+                        print( str( error ) + " file(s) not transferred" )
+                    print( "Overall progress: " + str( int( percent ) ) + "%\n" )
+            print( response )
         else:
-            print "SD card is not plugged in!"
+            print( "SD card is not plugged in!" )
 	
 """
 Saves the user's MoveIt settings in a settings file
@@ -342,13 +342,13 @@ Saves the user's MoveIt settings in a settings file
 def Save(fileName,pathlist):
     pathFile = file(fileName,'wb')
     pickle.dump(pathlist,pathFile)
-    print "Settings saved"
+    print( "Settings saved" )
 
 """
 Presents user with a list of the storage devices connected to the computer
 """
 def ShowVolumes():
-    print "Searching for Volumes..."
+    print( "Searching for Volumes..." )
     VolumeList = GetVolumes()
     for i in range(len(VolumeList)):
-        print VolumeList[i][0]+": "+VolumeList[i][1]
+        print( VolumeList[i][0]+": "+VolumeList[i][1] )
