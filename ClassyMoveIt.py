@@ -183,7 +183,7 @@ class GoButton:
             tkMessageBox.showerror( "Error", "The source path is not available or does not exist!" )
         
         elif len( os.listdir( pathList[ 'Source' ] ) ) == 0:
-			tkMessageBox.showerror( "Error", "The source directory is empty!" )
+            tkMessageBox.showerror( "Error", "The source directory is empty!" )
             
         elif not os.path.exists( pathList[ 'Primary' ] ):
             tkMessageBox.showerror( "Error", "The primary path is not available or does not exist!" )
