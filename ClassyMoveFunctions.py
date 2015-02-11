@@ -11,10 +11,7 @@ import shutil
 import os
 import os.path
 import pickle
-import string
-import subprocess
 import time
-from ctypes import windll
 
 """
 Function to copy or move files from one directory to its destination
@@ -51,83 +48,6 @@ def CopyAndMove(mode,startpath,endpath):
             print( 'Error! '+startpath+'/'+' not '+mode+'!' )
             response = 'One or more files not '+mode 
     return response
-    
-"""
-Function to present user with a way to select a directory path
-
-@current - a string to show the current set path
-"""
-def FindPath(current): 
-    os.system('cls')
-    print( "Current "+current )
-    print
-    skip = 0
-    ShowVolumes()
-    print
-    startpath = ''
-    while startpath in ['',':/']:
-        startpath = raw_input("Drive Label: ").upper()+':/'
-        if startpath == ':/':
-            choice = raw_input("Do you want to set the path as blank? (y/n)")   
-            if choice == 'y':                                                       #will set path as blank and exit
-                startpath = ''
-                break
-    if startpath.lower().strip(':/') in ['exit','quit']:
-            skip = 1;
-    print 
-    while startpath not in [':/','']  and skip == 0:
-        os.system('cls')
-        print( "Current "+current )
-        print( "Path being set: "+startpath )
-        print
-        for i in range(len(os.listdir(startpath))):
-                print( os.listdir(startpath)[i] )
-        if len(os.listdir(startpath))==0:
-            break
-        else:
-            print
-            path = raw_input("path (press Enter to mark current directory as path): ")
-            print
-            
-            if path in ['exit','quit']:
-                check = raw_input("Do you want to terminate the directory search process?(y/n)")
-                if check.lower() == 'y':
-                    skip = 1;
-                    break
-                else:
-                    pass
-
-            if path not in os.listdir(startpath) and path!='':
-                print
-                print( "That is not an existing directory path!" )
-                UserChoice = raw_input("Do you want to create this directory?(y/n)")
-                if UserChoice.lower() == 'y':
-                    os.mkdir(startpath+path)
-                    startpath += path
-                    break
-                elif UserChoice.lower()== 'n':
-                    continue
-                continue
-            elif os.path.isfile(startpath+path) or len(os.listdir(startpath+path))==0:
-                startpath+=path
-                break
-            elif path in ['']:
-                if startpath[-1]=='/' and len(startpath)>3:
-                    startpath=startpath[:-1]
-                break
-            else:
-                path+='/'
-                startpath+=path
-    if startpath == ':/':
-        startpath = ''
-    os.system('cls')
-    if skip == 0:
-        print( 'Path: '+startpath )
-        print
-        return startpath
-    else:
-        print( 'Path definition process terminated' )
-        return None
 
 """
 Gets the date of the file and formats the date string
@@ -167,41 +87,6 @@ def GetManualPath(pathType): #pathType needs to be a string
             elif UserChoice.lower()== 'n':
                 break  
     return path
-
-"""
-Gets the storage devices that are plugged into the computer
-"""
-def GetVolumes():
-    drives = []                                                 #list of all volumes
-    bitmask = windll.kernel32.GetLogicalDrives()
-    for letter in string.uppercase:
-        if bitmask & 1:
-            drives.append(letter)
-        bitmask >>= 1
-
-    driveList = []                                              #list of usable drive types
-    for drive in drives:                                        #Discovers drive types
-        if not drive: continue
-        try:
-            typeIndex = windll.kernel32.GetDriveTypeW(u"%s:\\"%drive)
-            if typeIndex not in [1,5,6]:
-                driveList.append(drive)
-        except:
-            pass
-        
-    driveDict = []                                              #list of drive letters + names
-    for i in range(len(driveList)):
-        char = 0; c=0
-        driveString = subprocess.check_output("VOL "+driveList[i]+": ",shell=True).strip(' ').split('\r\n')
-        if 'no label' in driveString[0]:
-            driveString[0] =' '
-        else:
-            for j in range(len(driveString[0])):
-                if driveString[0][-j]==' ':
-                    driveString[0] = driveString[0][-j+1:]
-                    break
-        driveDict.append([driveList[i][0],driveString[0]])
-    return driveDict
 
 """
 The main function of MoveIt. Will copy/move the specified directory files into their
@@ -343,12 +228,3 @@ def Save(fileName,pathlist):
     pathFile = file(fileName,'wb')
     pickle.dump(pathlist,pathFile)
     print( "Settings saved" )
-
-"""
-Presents user with a list of the storage devices connected to the computer
-"""
-def ShowVolumes():
-    print( "Searching for Volumes..." )
-    VolumeList = GetVolumes()
-    for i in range(len(VolumeList)):
-        print( VolumeList[i][0]+": "+VolumeList[i][1] )
