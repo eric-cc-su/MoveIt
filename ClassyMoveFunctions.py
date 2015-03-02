@@ -27,26 +27,19 @@ def CopyAndMove(mode,startpath,endpath):
         if not os.path.exists(endpath):     #endpath does not exist (create directory)
             os.mkdir(endpath)
             print( "CREATED DIRECTORY: "+endpath+'\n' )
-        for i in range(len(fileList)):      #iterate through directory and copy files
-            try:
-                if mode=='copied':
-                    shutil.copy2(startpath+'/'+fileList[i],endpath)
-                elif mode=='moved':
-                    shutil.move(startpath+'/'+fileList[i],endpath)
-                print( mode.capitalize()+' '+startpath+'/'+fileList[i] )
-            except:
-                print( 'Error! '+startpath+'/'+fileList[i]+' not '+mode+'!' )
-                response = 'One or more files not '+mode
     else:
+        fileList = [startpath]
+
+    for i in range(len(fileList)):      #iterate through directory and copy files
         try:
             if mode=='copied':
-                shutil.copy2(startpath,endpath)
+                shutil.copy2(startpath+'/'+fileList[i],endpath)
             elif mode=='moved':
-                shutil.move(startpath,endpath)
-            print( mode.capitalize()+' '+startpath+' to '+endpath )
+                shutil.move(startpath+'/'+fileList[i],endpath)
+            print( mode.capitalize()+' '+startpath+'/'+fileList[i] )
         except:
-            print( 'Error! '+startpath+'/'+' not '+mode+'!' )
-            response = 'One or more files not '+mode 
+            print( 'Error! '+startpath+'/'+fileList[i]+' not '+mode+'!' )
+            response = 'One or more files not '+mode
     return response
 
 """
@@ -57,15 +50,12 @@ Gets the date of the file and formats the date string
 def GetDate(path):                                  
     thetime = time.gmtime(os.path.getmtime(path)) #CURRENTLY SET TO MODIFICATION DATE
     dateYr = str(thetime.tm_year)[-2:]
+    dateMon = str(thetime.tm_mon)
+    dateDay = str(thetime.tm_mday)
     if thetime.tm_mon < 10:
-        dateMon = '0'+str(thetime.tm_mon)
-    else:
-        dateMon = str(thetime.tm_mon)
-
+        dateMon = '0'+dateMon
     if thetime.tm_mday<10:
-        dateDay = '0'+str(thetime.tm_mday)
-    else:
-        dateDay = str(thetime.tm_mday)
+        dateDay = '0'+dateDay
     dateString = dateYr+'-'+dateMon+'-'+dateDay
     return dateString
 
@@ -75,7 +65,7 @@ Get the directory path that the user manually types in
 @pathType - String - user's input path
 """
 def GetManualPath(pathType): #pathType needs to be a string
-    while 1==1:
+    while True:
         path = raw_input(pathType+" path: ")
         if os.path.exists(path):
             break
@@ -94,6 +84,9 @@ determined destinations
 
 @mode - String - whether to copy or move files
 @sort - String - How the files should be sorted into sub-directories in their destination
+    format: *1/0 for primary dest* *1/0 for backup* *string for type* *optional: folder name*
+    ex: '11date' = sort by date subfolders in primary & backup
+    ex: '10one test' = sort by subfolder "test" in only primary
 @source - String - the source path name
 @primary - String - the primary destination path name
 @backup - String - the backup destination path name
@@ -216,8 +209,8 @@ def go ( mode, sort, source, primary, backup ):
                     print( "Overall progress: " + str( int( percent ) ) + "%\n" )
             print( response )
         else:
-            print( "SD card is not plugged in!" )
-	
+            print( "Source directory does not exist!" )
+
 """
 Saves the user's MoveIt settings in a settings file
 

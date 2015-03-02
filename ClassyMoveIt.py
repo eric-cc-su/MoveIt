@@ -22,18 +22,14 @@ import tkFont
 import tkMessageBox
 from ClassyMoveFunctions import *
 
-"""
-Tool/Menu bar of GUI
-"""
+#Tool/Menu bar of GUI
 class AppMenu(Frame):
     def __init__(self,master):
         Frame.__init__(self,master)
         self.grid()
         self.widgets()
 
-    """
-    Toolbar menu labels
-    """
+    #Toolbar menu labels
     def widgets(self):
         menubar = Menu(root)
 
@@ -50,9 +46,7 @@ class AppMenu(Frame):
 
         root.config(menu=menubar)
 
-    """
-    Close program
-    """
+    #Close program
     def kill(self):
         self.checkList = pickle.load(file('SDpathfile.db','r'))
         if self.checkList != pathList:
@@ -61,9 +55,7 @@ class AppMenu(Frame):
         else:
             root.destroy()
     
-    """
-    Save paths and any settings by dumping into .db file
-    """
+    #Save paths and any settings by dumping into .db file
     def save(self):
         pathList['Source'] = browse.sourcebox.get()
         pathList['Primary'] = browse.primarybox.get()
@@ -71,36 +63,28 @@ class AppMenu(Frame):
         pickle.dump(pathList, file('SDpathfile.db','wb'))
         tkMessageBox.showinfo("Saved", "Settings have been saved.")
     
-    """
-    Display "About" window with info about program
-    """
+    #Display "About" window with info about program
     def showAbout(self):
         about = Toplevel()
         about.title("About...")
         about_exit = Button(about, text = "OK", command = about.destroy)
         about_exit.pack()
     
-    """
-    Display "Help" window for program
-    """
+    #Display "Help" window for program
     def showHelp(self):
         helpWin = Toplevel()
         helpWin.title("Help")
         help_exit = Button(helpWin, text = "OK", command = helpWin.destroy)
         help_exit.pack()
     
-    """
-    Display "Settings" window
-    """ 
+    #Display "Settings" window
     def showSettings(self):
         settings = Toplevel()
         settings.title("Settings")
         settings_exit = Button(settings, text = "OK", command = settings.destroy)
         settings_exit.pack()
 
-"""
-GUI section with directory selection boxes (pathboxes)
-"""
+#GUI section with directory selection boxes (pathboxes)
 class Browse(Frame):
     def __init__(self,master, paths):
         self.paths = paths
@@ -108,9 +92,7 @@ class Browse(Frame):
         self.grid(row = 0, column = 0, sticky = W, columnspan = 3)
         self.widgets()
 
-    """
-    The pathboxes and buttons 
-    """
+    #The pathboxes and buttons
     def widgets(self):
         self.sourcebox = Pathbox(root, "Source", 0)
         self.primarybox = Pathbox(root, "Primary", 1)
@@ -123,10 +105,8 @@ class Browse(Frame):
         self.sourcebox.insert(0,self.paths['Source'])
         self.primarybox.insert(0,self.paths['Primary'])
         self.backupbox.insert(0,self.paths['Backup'])
-    
-    """
-    Function to swap values between `primary` and `backup` pathboxes
-    """
+
+    #Function to swap values between `primary` and `backup` pathboxes
     def swapPaths(self):
         primarytemp = self.paths['Primary']
         self.paths['Primary'] = self.paths['Backup']
@@ -135,9 +115,7 @@ class Browse(Frame):
         self.primarybox.update(self.paths['Primary'])
         self.backupbox.update(self.paths['Backup'])
 
-"""
-Big green "GO" button to run MoveIt functions
-"""      
+#Big green "GO" button to run MoveIt functions
 class GoButton:
     def __init__(self,root):
         gb = Button(root, text = "GO!",
@@ -207,18 +185,14 @@ class GoButton:
     def keyPress(self, event):
         self.check()
 
-"""
-Mode selection GUI section
-"""
+#Mode selection GUI section
 class ModeSelect(LabelFrame):
     def __init__(self, master):
         LabelFrame.__init__(self,master,text = "Mode")
         self.grid(row = 0, column = 3, rowspan = 4, padx = 10, sticky = W)
         self.widgets()
 
-    """
-    The checkboxes and widgets of mode selection
-    """
+    #The checkboxes and widgets of mode selection
     def widgets(self):
         self.modevar = StringVar()
         self.modevar.set(pathList['Mode'])
@@ -233,16 +207,12 @@ class ModeSelect(LabelFrame):
         move1.pack(anchor = W)
         move2.pack(anchor = W)
     
-    """
-    Update the "mode" setting
-    """
+    #Update the "mode" setting
     def update(self):
         pathList['Mode'] = self.modevar.get()
         browse.backupbox.updateState()
 
-"""
-Individual directory path box (define and display directory path)
-"""
+#Individual directory path box (define and display directory path)
 class Pathbox:
     def __init__(self, root, var, row):
         self.row = row
@@ -253,31 +223,23 @@ class Pathbox:
 
         browse = Button(root, text = 'Browse...', command = self.gobrowse)
         browse.grid(row = self.row, column = 2, padx = 5)
-    
-    """
-    Return the contents of the pathbox
-    """
+
+    #Return the contents of the pathbox
     def get(self):
         return self.box.get()
 
-    """
-    Run directory selection tool
-    """
+    #Run directory selection tool
     def gobrowse(self):
         getdirectory = tkFileDialog.askdirectory(title = 'Select Directory', initialdir = self.box.get())
         if getdirectory != '':
             self.update( getdirectory )
             pathList[ self.var ] = getdirectory
 
-    """
-    Insert value into pathbox
-    """
+    #Insert value into pathbox
     def insert(self, index, info):
         self.box.insert(index,info)
 
-    """
-    Update the contents of the pathbox
-    """
+    #Update the contents of the pathbox
     def update(self,info):
         if self.box.cget('state') != 'NORMAL': #Enable textbox for edit if disabled
             tempConfigVar = self.box.cget('state')
@@ -290,10 +252,8 @@ class Pathbox:
                 self.box.config(state = tempConfigVar)
             except:
                 pass
-    
-    """
-    Update the state of the pathbox (active/inactive)
-    """       
+
+    #Update the state of the pathbox (active/inactive)
     def updateState(self):
         if '1' in mode.modevar.get():
             self.box.config(state = 'readonly', readonlybackground = 'grey')
@@ -305,10 +265,8 @@ class Pathbox:
             else:
                 self.box.config( bg = 'white' )
             """
-
 """
-New window to display MoveIt progress/updates
-"""
+#New window to display MoveIt progress/updates
 class Status: #status window
     def __init__(self):
         self.window = Toplevel()
@@ -321,15 +279,12 @@ class Status: #status window
         self.text.grid( row = 0 )
         
         self.statusUpdates( pathList[ 'Mode' ], pathList[ 'sort' ], pathList[ 'Source' ], pathList[ 'Primary' ], pathList[ 'Backup' ] )
-        """
-        self.text = Text( self.window, relief = FLAT, height = 13 )
-        self.text.insert( INSERT, "File Transfer in Progress\n")
-        self.text.grid()
-        """
-    
-    """
-    Provide status updates to display progress/issues
-    """
+
+        #self.text = Text( self.window, relief = FLAT, height = 13 )
+        #self.text.insert( INSERT, "File Transfer in Progress\n")
+        #self.text.grid()
+
+    #Provide status updates to display progress/issues
     def statusUpdates( self, mode, sort, source, primary, backup ):
         skip = 0
         response = "success"
@@ -415,13 +370,11 @@ class Status: #status window
                     elif os.path.isdir( Gosource ):
                         try:
                             shutil.copytree( Gosource, base + suffix + "/" + item )
-                            """
-                            self.text.insert( END, keyword.capitalize() + ": " + Gosource + "\n" )
-                            self.text.insert( END, "To: " + ( base + suffix ) + "\n" )
+                            #self.text.insert( END, keyword.capitalize() + ": " + Gosource + "\n" )
+                            #self.text.insert( END, "To: " + ( base + suffix ) + "\n" )
                             
-                            self.line0.config( text = keyword.capitalize() + ": " + Gosource )
-                            self.line1.config( text = "To: " + ( base + suffix ) )
-                            """
+                            #self.line0.config( text = keyword.capitalize() + ": " + Gosource )
+                            #self.line1.config( text = "To: " + ( base + suffix ) )
                             line0 = keyword.capitalize() + ": " + Gosource + '\n'
                             line1 = "To: " + ( base + suffix ) + '\n'
                             success += 1
@@ -436,13 +389,11 @@ class Status: #status window
                             elif mode == "move1" or ( mode == "move2" and t == 1 ):
                                 shutil.move( Gosource, base + suffix )
                             #**Clear window**
-                            """
-                            self.text.insert( END, keyword.capitalize() + ": " + Gosource + "\n" )
-                            self.text.insert( END, "To: " + ( base + suffix ) + "\n" )
+                            #self.text.insert( END, keyword.capitalize() + ": " + Gosource + "\n" )
+                            #self.text.insert( END, "To: " + ( base + suffix ) + "\n" )
                             
-                            self.line0.config( text = keyword.capitalize() + ": " + Gosource )
-                            self.line1.config( text = "To: " + ( base + suffix ) )
-                            """
+                            #self.line0.config( text = keyword.capitalize() + ": " + Gosource )
+                            #self.line1.config( text = "To: " + ( base + suffix ) )
                             line0 = keyword.capitalize() + ": " + Gosource + '\n'
                             line1 = "To: " + ( base + suffix ) + '\n'
                             success += 1
@@ -472,19 +423,16 @@ class Status: #status window
                     root.update_idletasks()
             #self.text.insert( END, response + "\n" )
             self.text.config( text = response )
-            
 """
-GUI section to select subfolders to move files to
-"""
+
+#GUI section to select subfolders to move files to
 class SubfolderSelect(LabelFrame):
     def __init__(self,master):
         LabelFrame.__init__(self, master, text = "Sub-Folder")
         self.grid (row = 4, column = 3, rowspan = 4, padx = 10, pady = 10, sticky = W)
         self.widgets()
-        
-    """
-    Widgets for subfolder selection
-    """
+
+    #Widgets for subfolder selection
     def widgets(self):
         self.pplacement = IntVar()
         self.bplacement = IntVar()
@@ -513,9 +461,7 @@ class SubfolderSelect(LabelFrame):
         self.onesort.grid(row = 2, column = 0, sticky = W)
         self.onesortbox.grid(row = 2, column = 1, padx = 5, sticky = E)
 
-    """
-    Update settings to save subfolder
-    """
+    #Update settings to save subfolder
     def update(self):
         pathList['sort'] = str(self.pplacement.get())+str(self.bplacement.get())+str(self.sortvar.get())
         #return True
