@@ -10,16 +10,11 @@ import re
 import sys
 
 clear_console = 'clear'
+delimiter = '/'
 
 if 'win' in str(sys.platform):
     clear_console = 'cls'
-
-#return proper delimiter based on pathname given
-def check_delimiter(path):
-    delimiter = '/'
-    if '/' not in path and '\\' in path:
-        delimiter = '\\'
-    return delimiter
+    delimiter = '\\'
 
 """
 Function to specifically re-date files in format MM-DD-YY_####
@@ -33,7 +28,7 @@ def redate(sourcepath, mode):
     if mode not in ['add', 'replace']:
         return "Not a proper mode"
 
-    delimiter = check_delimiter(sourcepath)
+    global delimiter
 
     parent = prefix = sourcepath
     if os.path.isfile(sourcepath):
@@ -53,7 +48,8 @@ def redate(sourcepath, mode):
         file_list = os.listdir(sourcepath)
 
     elif os.path.isfile(sourcepath):
-        prefix = sourcepath[:sourcepath.rfind(delimiter)]
+        prefix = sourcepath[:sourcepath.rfind(delimiter)]\
+        .replace('/', delimiter).replace('\\', delimiter)
 
     else:
         print("Bad path: " + sourcepath)
@@ -81,7 +77,7 @@ def scan_directory(path):
     if not os.path.isdir(path):
         return "Not a directory"
 
-    delimiter = check_delimiter(path)
+    global delimiter
 
     dir_contents = os.listdir(path)
     for item in dir_contents:
@@ -112,7 +108,7 @@ def validate_date_string(file_name):
 #Rename all of the files within a file tree to the date format specified above
 
 def rename_tree_files(path):
-    delimiter = check_delimiter(path)
+    global delimiter
 
     for dirpath, dirnames, filenames in os.walk(path):
         parent = dirpath[dirpath.rfind(delimiter) + 1:]
@@ -135,6 +131,7 @@ def rename_tree_files(path):
 
 #print( validate_date_string('02-02-22_file') )
 #print( rename_tree_files('/home/eric/Documents/MoveTest') )
+print( rename_tree_files('C:/Users/sue3/Documents/MoveTest') )
 
 sourcepath = ''
 mode = 'replace'
