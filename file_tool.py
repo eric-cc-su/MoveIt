@@ -9,6 +9,18 @@ import os.path
 import re
 import sys
 
+clear_console = 'clear'
+
+if 'win' in str(sys.platform):
+    clear_console = 'cls'
+
+#return proper delimiter based on pathname given
+def check_delimiter(path):
+    delimiter = '/'
+    if '/' not in path and '\\' in path:
+        delimiter = '\\'
+    return delimiter
+
 """
 Function to specifically re-date files in format MM-DD-YY_####
 
@@ -21,9 +33,7 @@ def redate(sourcepath, mode):
     if mode not in ['add', 'replace']:
         return "Not a proper mode"
 
-    delimiter = '\\'
-    if delimiter not in sourcepath and '/' in sourcepath:
-        delimiter = '/'
+    delimiter = check_delimiter(sourcepath)
 
     parent = prefix = sourcepath
     if os.path.isfile(sourcepath):
@@ -54,7 +64,7 @@ def redate(sourcepath, mode):
             suffix = date_string + '_' + file
             if mode == 'replace' and file[8] == '_':
                 suffix = date_string + file[8:]
-            os.rename(prefix + '\\' + file, prefix + '\\' + suffix)
+            os.rename(prefix + delimiter + file, prefix + delimiter + suffix)
 
     return True
 
@@ -71,9 +81,11 @@ def scan_directory(path):
     if not os.path.isdir(path):
         return "Not a directory"
 
+    delimiter = check_delimiter(path)
+
     dir_contents = os.listdir(path)
     for item in dir_contents:
-        item_path = path + '\\' + item
+        item_path = path + delimiter + item
         if os.path.isdir(item_path):
             file_count += scan_directory(item_path)
         elif os.path.isfile(item_path):
@@ -97,56 +109,38 @@ def validate_date_string(file_name):
     return False
 
 
-"""
-Rename all of the files within a file tree to the date format specified
-"""
-
+#Rename all of the files within a file tree to the date format specified above
 
 def rename_tree_files(path):
+    delimiter = check_delimiter(path)
+
     for dirpath, dirnames, filenames in os.walk(path):
-        parent = dirpath[dirpath.rfind('\\') + 1:]
+        parent = dirpath[dirpath.rfind(delimiter) + 1:]
         date_values = parent.split('-')
 
         if len(date_values) == 3:
-            """
-            date_string = date_values[1] + '-' + date_values[2] + '-' + \
-                          date_values[0]
-
-            #print( date_string + ": " )
-            """
             for file in filenames:
                 mode_input = "replace"
                 if len(file) < 8 or not validate_date_string(file):
                     mode_input = "add"
 
-                if not redate(dirpath + '\\' + file, mode_input):
+                if not redate(dirpath + delimiter + file, mode_input):
                     raise Exception("Failed to rename file")
-            return True
-    return False
+    return True
 
 
 # print( redate('C:\\Users\\sue3\\Documents\\MoveTest\\15-01-14', 'replace') )
-print("\nFile count: " + str(scan_directory('C:\\Users\\sue3\\Documents\\'
-                                            'MoveTest')))
-print(redate('C:\\Users\\sue3\\Documents\\MoveTest\\15-01-14\\'
-             '01-14-11_cc-wallpaper-desktop.png', 'replace'))
+#print("\nFile count: " + str(scan_directory('/home/eric/Documents/MoveTest')))
+#print(redate('/home/eric/Documents/MoveTest', 'replace'))
 
 #print( validate_date_string('02-02-22_file') )
-#rename_tree_files('C:\\Users\\sue3\\Documents\\MoveTest')
-
-
-def clear_console():
-    if 'win' in str(sys.platform):
-        os.system('cls')
-    else:
-        os.system('clear')
-
+#print( rename_tree_files('/home/eric/Documents/MoveTest') )
 
 sourcepath = ''
 mode = 'replace'
 
 while True:
-    clear_console()
+    os.system(clear_console)
     print('******************************************************************')
     print('*                            File Tool                           *')
     print('*                            Eric Su                             *')
@@ -179,7 +173,7 @@ while True:
         input('Press any key to continue...')
 
     elif user == '8':
-        clear_console()
+        os.system(clear_console)
         while True:
             verify = input('This will search through the entire file tree and '
                            'rename every file to fit date format. Are you sure'
