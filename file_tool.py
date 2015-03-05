@@ -125,14 +125,6 @@ def rename_tree_files(path):
     return True
 
 
-# print( redate('C:\\Users\\sue3\\Documents\\MoveTest\\15-01-14', 'replace') )
-#print("\nFile count: " + str(scan_directory('/home/eric/Documents/MoveTest')))
-#print(redate('/home/eric/Documents/MoveTest', 'replace'))
-
-#print( validate_date_string('02-02-22_file') )
-#print( rename_tree_files('/home/eric/Documents/MoveTest') )
-print( rename_tree_files('C:/Users/sue3/Documents/MoveTest') )
-
 sourcepath = ''
 mode = 'replace'
 
