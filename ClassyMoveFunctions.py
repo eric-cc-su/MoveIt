@@ -1,223 +1,248 @@
-#2.1
-#GetVolumes has been revised
-"""
-FindPath has been revised
-    - includes 'exit'/'quit' keyword and to check if path is file
-    - screen clearing
-    - takes string parameter to display currently set path
-"""
-
 import shutil
 import os
 import os.path
 import pickle
 import time
 
-"""
-Function to copy or move files from one directory to its destination
+def CopyAndMove(mode, startpath, endpath):
+    """
+        Function to copy or move files from one directory to its destination
 
-@mode - Mode sets whether moving or copying, allowed inputs: 'copied','moved'
-@startpath - Directory to start in 
-@endpath - Directory to end in
-"""
-def CopyAndMove(mode,startpath,endpath):
+        :param mode: Whether moving or copying. Either 'copied' or 'moved'
+        :param startpath: Directory to start in
+        :param endpath: Directory to end in
+
+        :type mode: string
+        :type startpath: string
+        :type endpath: string
+    """
     response = 'success'
-    if os.path.isdir(startpath):            #startpath is a directory
+    # startpath is a directory
+    if os.path.isdir(startpath):
         fileList = os.listdir(startpath)
-        if not os.path.exists(endpath):     #endpath does not exist (create directory)
+        # endpath does not exist (create directory)
+        if not os.path.exists(endpath):
             os.mkdir(endpath)
-            print( "CREATED DIRECTORY: "+endpath+'\n' )
+            print("CREATED DIRECTORY: " + endpath + '\n')
     else:
         fileList = [startpath]
 
-    for i in range(len(fileList)):      #iterate through directory and copy files
+    # iterate through directory and copy files
+    for i in range(len(fileList)):
         try:
-            if mode=='copied':
-                shutil.copy2(startpath+'/'+fileList[i],endpath)
-            elif mode=='moved':
-                shutil.move(startpath+'/'+fileList[i],endpath)
-            print( mode.capitalize()+' '+startpath+'/'+fileList[i] )
+            if mode == 'copied':
+                shutil.copy2(startpath + '/' + fileList[i], endpath)
+            elif mode == 'moved':
+                shutil.move(startpath + '/' + fileList[i], endpath)
+            print(mode.capitalize() + ' ' + startpath + '/' + fileList[i])
         except:
-            print( 'Error! '+startpath+'/'+fileList[i]+' not '+mode+'!' )
-            response = 'One or more files not '+mode
+            print('Error! {}/{} not {}!'.format(startpath, fileList[i], mode))
+            response = 'One or more files not ' + mode
     return response
 
-"""
-Gets the date of the file and formats the date string
+def GetDate(path):
+    """
+        Gets the date of the file and formats the date string
 
-@path - String - the path of the file to get date of
-"""
-def GetDate(path):                                  
-    thetime = time.gmtime(os.path.getmtime(path)) #CURRENTLY SET TO MODIFICATION DATE
+        :param path: the path of the file to get date of
+
+        :type path: string
+    """
+    # CURRENTLY SET TO MODIFICATION DATE
+    thetime = time.gmtime(os.path.getmtime(path))
     dateYr = str(thetime.tm_year)[-2:]
     dateMon = str(thetime.tm_mon)
     dateDay = str(thetime.tm_mday)
     if thetime.tm_mon < 10:
-        dateMon = '0'+dateMon
-    if thetime.tm_mday<10:
-        dateDay = '0'+dateDay
-    dateString = dateYr+'-'+dateMon+'-'+dateDay
+        dateMon = '0' + dateMon
+    if thetime.tm_mday < 10:
+        dateDay = '0' + dateDay
+    dateString = dateYr + '-' + dateMon + '-' + dateDay
     return dateString
 
-"""
-Get the directory path that the user manually types in
+def GetManualPath(pathType):
+    """
+        Get the directory path that the user manually types in
 
-@pathType - String - user's input path
-"""
-def GetManualPath(pathType): #pathType needs to be a string
+        :param pathType: user's input path
+
+        :type pathType: string
+    """
     while True:
-        path = raw_input(pathType+" path: ")
+        path = raw_input(pathType + " path: ")
         if os.path.exists(path):
             break
         else:
-            print( "That is not an existing directory path!" )
-            UserChoice = raw_input("Do you want to create this directory?(y/n)")
+            print("That is not an existing directory path!")
+            UserChoice = raw_input(
+                "Do you want to create this directory?(y/n)")
             if UserChoice.lower() == 'y':
                 os.mkdir(path)
-            elif UserChoice.lower()== 'n':
-                break  
+            elif UserChoice.lower() == 'n':
+                break
     return path
 
-"""
-The main function of MoveIt. Will copy/move the specified directory files into their
-determined destinations
+def go(mode, sort, source, primary, backup):
+    """
+        The main function of MoveIt. Will copy/move the specified
+        directory files into their determined destinations
 
-@mode - String - whether to copy or move files
-@sort - String - How the files should be sorted into sub-directories in their destination
-    format: *1/0 for primary dest* *1/0 for backup* *string for type* *optional: folder name*
-    ex: '11date' = sort by date subfolders in primary & backup
-    ex: '10one test' = sort by subfolder "test" in only primary
-@source - String - the source path name
-@primary - String - the primary destination path name
-@backup - String - the backup destination path name
-"""
-def go ( mode, sort, source, primary, backup ):
+        :param mode: whether to copy or move files
+        :param sort: How the files should be sorted into sub-directories in
+            their destination.
+            format: *1/0 for primary dest* *1/0 for backup* *string for type* *optional: folder name*
+            ex: '11date' = sort by date subfolders in primary & backup
+            ex: '10one test' = sort by subfolder "test" in only primary
+        :param source: the source path name
+        :param primary: the primary destination path name
+        :param backup: the backup destination path name
+
+        :type mode: string
+        :type sort: string
+        :type source: string
+        :type primary: string
+        :type backup: string
+    """
     skip = 0
     response = "success"
 
-    if backup == None and mode in [ 'copy2', 'move2' ]:
-        print( "Back-Up destination path has not been defined!" )
+    if backup is None and mode in ['copy2', 'move2']:
+        print("Back-Up destination path has not been defined!")
         skip = 1
 
     if skip == 0:
-        #SD Card is plugged in
-        if os.path.exists( source ):
-            #List files in directory
-            sourceFiles = os.listdir( source )
-            
-            total = len( sourceFiles )
-            #Number of times the transfer loop needs to execute
-            task = 1 
+        # SD Card is plugged in
+        if os.path.exists(source):
+            # List files in directory
+            sourceFiles = os.listdir(source)
+
+            total = len(sourceFiles)
+            # Number of times the transfer loop needs to execute
+            task = 1
             if '2' in mode:
                 total *= 2
                 task = 2
-            itemsdone = 0; success = 0; error = 0
-            percent = ( float( itemsdone ) / float( total ) ) * 100
-            
+            itemsdone = 0
+            success = 0
+            error = 0
+            percent = (float(itemsdone)/float(total))*100
+
             keyword = "copied"
             if mode == "move1":
                 keyword = "moved"
-            
+
             Goprimary = primary
             try:
                 Gobackup = backup
             except:
                 pass
-            
-            #Only copy/move to primary
+
+            # Only copy/move to primary
             if task == 1:
                 base = Goprimary
-            #Copy/move to both, start with backup
+            # Copy/move to both, start with backup
             elif task == 2:
                 base = Gobackup
-            
-            for t in range( task ):
+
+            for t in range(task):
                 subfolder = False
-                #Second time on file transfer loop, move on to primary
+                # Second time on file transfer loop, move on to primary
                 if task == 2 and t == 1:
                     base = Goprimary
-                    #Switch keyword
+                    # Switch keyword
                     if mode == "move2":
                         keyword = "moved"
-                
+
                 suffix = ''
                 for item in sourceFiles:
                     Gosource = source + "/" + item
-                    
-                    
-                    if task == 1 and sort[ t ] == '1':
+
+                    if task == 1 and sort[t] == '1':
                         subfolder = True
                     elif task == 2:
-                        if t == 0 and sort[ 1 ] == '1':
+                        if t == 0 and sort[1] == '1':
                             subfolder = True
-                        elif t == 1 and sort[ 0 ] == '1':
+                        elif t == 1 and sort[0] == '1':
                             subfolder = True
-                            
-                    #Current task loop requires files to be placed in subfolder
+
+                    # Current task loop requires files to be placed
+                    # in subfolder
                     if subfolder:
                         if 'one' in sort:
-                            folderName = sort[ sort.find( ' ' ) + 1: ]
+                            folderName = sort[sort.find(' ') + 1:]
                             suffix = "/" + folderName
                         elif 'date' in sort:
-                            suffix = "/" + GetDate( Gosource )
-                        #Create sub-directories if needed
-                        if not os.path.exists( base + suffix ) and not os.path.isdir( base + suffix ):
-                            os.mkdir( base + suffix )
-                            print( "Directory: " + ( base + suffix ) + " created\n" )
-                    
-                    #Does not transfer file if file already exists in destination
-                    if os.path.exists( base + suffix + "/" + item ):
-                        os.system( 'cls' )
-                        print( base + suffix + " already exists! File not transferred" )
+                            suffix = "/" + GetDate(Gosource)
+                        # Create sub-directories if needed
+                        if (not os.path.exists(base + suffix) and
+                            not os.path.isdir(base + suffix)):
+                                os.mkdir(base + suffix)
+                                print("Directory: {} created\n".format(
+                                    base + suffix))
+
+                    # Does not transfer file if file already
+                    # exists in destination
+                    if os.path.exists(base + suffix + "/" + item):
+                        os.system('cls')
+                        print("{} already exists! File not transferred".format(
+                            base + suffix))
                         response = "One or more files not transferred"
                         error += 1
-                    
-                    #object encountered is a directory
-                    elif os.path.isdir( Gosource ):
+
+                    # object encountered is a directory
+                    elif os.path.isdir(Gosource):
                         try:
-                            shutil.copytree( Gosource, base + suffix + "/" + item )
-                            print( keyword.capitalize() + ": " + Gosource )
-                            print( "To: " + ( base + suffix ) )
+                            shutil.copytree(Gosource, base + suffix + "/" + item)
+                            print(keyword.capitalize() + ": " + Gosource)
+                            print("To: " + (base + suffix))
                             success += 1
                         except:
                             response = "One or more files not transferred"
                             error += 1
-                    
+
                     else:
                         try:
-                            if "copy" in mode or ( mode == "move2" and t == 0 ):
-                                    shutil.copy2( Gosource, base + suffix )
-                            elif mode == "move1" or ( mode == "move2" and t == 1 ):
-                                    shutil.move( Gosource, base + suffix )
-                            os.system( "cls" )
-                            print( keyword.capitalize() + ": " + Gosource )
-                            print( "To: " + ( base + suffix ) )
+                            if "copy" in mode or (mode == "move2" and t == 0):
+                                    shutil.copy2(Gosource, base + suffix)
+                            elif (mode == "move1" or
+                                    (mode == "move2" and t == 1)):
+                                        shutil.move(Gosource, base + suffix)
+                            os.system("cls")
+                            print(keyword.capitalize() + ": " + Gosource)
+                            print("To: " + (base + suffix))
                             success += 1
-                        
+
                         except:
-                            print( "Error! " + Gosource + "/ not " + keyword + " to " + ( base + suffix ) + "!" )
+                            print("Error! {}/ not {} to {}!".format(
+                                Gosource,
+                                keyword,
+                                base+suffix
+                            ))
                             response = "One or more files not transferred"
                             error += 1
-                    
+
                     itemsdone += 1
                     percent = (float(itemsdone)/float(total))*100
-                    print 
+                    print
                     if success != 0:
-                        print( str( success ) + "/" + str( total ) + " file(s) transferred" )
+                        print("%d/%d file(s) transferred" % (success, total))
                     if error != 0:
-                        print( str( error ) + " file(s) not transferred" )
-                    print( "Overall progress: " + str( int( percent ) ) + "%\n" )
-            print( response )
+                        print("{} file(s) not transferred".format(error))
+                    print("Overall progress: {}%\n".format(int(percent)))
+            print(response)
         else:
-            print( "Source directory does not exist!" )
+            print("Source directory does not exist!")
 
-"""
-Saves the user's MoveIt settings in a settings file
+def Save(fileName, pathlist):
+    """
+        Saves the user's MoveIt settings in a settings file
 
-@fileName - String - the name of the settings file
-@pathlist - list of the GUI settings, will be saved into file
-"""
-def Save(fileName,pathlist):
-    pathFile = file(fileName,'wb')
-    pickle.dump(pathlist,pathFile)
-    print( "Settings saved" )
+        :param fileName: the name of the settings file
+        :param pathlist: list of the GUI settings, will be saved into file
+
+        :type fileName: string
+        :type pathlist: list
+    """
+    pathFile = file(fileName, 'wb')
+    pickle.dump(pathlist, pathFile)
+    print("Settings saved")
