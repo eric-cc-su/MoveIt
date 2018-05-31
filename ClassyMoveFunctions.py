@@ -4,7 +4,8 @@ import os.path
 import pickle
 import time
 
-def CopyAndMove(mode, startpath, endpath):
+
+def copy_and_move(mode, startpath, endpath):
     """
         Function to copy or move files from one directory to its destination
 
@@ -40,7 +41,8 @@ def CopyAndMove(mode, startpath, endpath):
             response = 'One or more files not ' + mode
     return response
 
-def GetDate(path):
+
+def get_date(path):
     """
         Gets the date of the file and formats the date string
 
@@ -60,7 +62,8 @@ def GetDate(path):
     dateString = dateYr + '-' + dateMon + '-' + dateDay
     return dateString
 
-def GetManualPath(pathType):
+
+def get_manual_path(pathType):
     """
         Get the directory path that the user manually types in
 
@@ -81,6 +84,7 @@ def GetManualPath(pathType):
             elif UserChoice.lower() == 'n':
                 break
     return path
+
 
 def go(mode, sort, source, primary, backup):
     """
@@ -172,7 +176,7 @@ def go(mode, sort, source, primary, backup):
                             folderName = sort[sort.find(' ') + 1:]
                             suffix = "/" + folderName
                         elif 'date' in sort:
-                            suffix = "/" + GetDate(Gosource)
+                            suffix = "/" + get_date(Gosource)
                         # Create sub-directories if needed
                         if (not os.path.exists(base + suffix) and
                             not os.path.isdir(base + suffix)):
@@ -192,9 +196,15 @@ def go(mode, sort, source, primary, backup):
                     # object encountered is a directory
                     elif os.path.isdir(Gosource):
                         try:
-                            shutil.copytree(Gosource, base + suffix + "/" + item)
-                            print(keyword.capitalize() + ": " + Gosource)
-                            print("To: " + (base + suffix))
+                            shutil.copytree(
+                                Gosource,
+                                "{}/{}".format(base + suffix, item)
+                            )
+                            print("{}: {}".format(
+                                keyword.capitalize(),
+                                Gosource)
+                            )
+                            print("To: {}".format(base + suffix))
                             success += 1
                         except:
                             response = "One or more files not transferred"
@@ -233,7 +243,8 @@ def go(mode, sort, source, primary, backup):
         else:
             print("Source directory does not exist!")
 
-def Save(fileName, pathlist):
+
+def save(fileName, pathlist):
     """
         Saves the user's MoveIt settings in a settings file
 
